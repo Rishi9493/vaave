@@ -11,9 +11,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchPosts } from '../../reducer/dataSlice';
 import { styles } from './styles';
 import { Card, TextInput } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
 const PostsListScreen = () => {
   const dispatch = useDispatch();
+  const { navigate } = useNavigation();
   const { data, loading } = useSelector(state => state.data);
 
   useEffect(() => {
@@ -32,7 +34,10 @@ const PostsListScreen = () => {
               <Text style={styles.titleText}>{item.title}</Text>
             </View>
             {item.body && (
-              <TouchableOpacity style={styles.userName}>
+              <TouchableOpacity
+                style={styles.userName}
+                onPress={() => navigate('user')}
+              >
                 <Text
                   style={{
                     textDecorationLine: 'underline',

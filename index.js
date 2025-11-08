@@ -9,13 +9,16 @@ import { Provider } from 'react-redux';
 import { store } from './src/store/store';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PaperProvider } from 'react-native-paper';
+import { NavigationContainer } from '@react-navigation/native';
 const Main = () => {
   return (
     <Provider store={store}>
       <SafeAreaProvider>
-        <PaperProvider>
-          <App />
-        </PaperProvider>
+        <NavigationContainer>
+          <PaperProvider>
+            <App />
+          </PaperProvider>
+        </NavigationContainer>
       </SafeAreaProvider>
     </Provider>
   );

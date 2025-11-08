@@ -6,6 +6,9 @@ const initialState = {
   loading: false,
   data: [],
   error: null,
+  userloading: false,
+  userData: [],
+  userError: null,
 };
 
 export const fetchPosts = createAsyncThunk(
@@ -20,7 +23,19 @@ export const fetchPosts = createAsyncThunk(
     }
   },
 );
-
+export const fetchUserById = createAsyncThunk(
+  'data/fetchUserById',
+  async (userId, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `https://jsonplaceholder.typicode.com/users/${userId}`,
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.message || 'Failed to fetch user');
+    }
+  },
+);
 const dataSlice = createSlice({
   name: 'data',
   initialState,
@@ -51,6 +66,20 @@ const dataSlice = createSlice({
         state.error =
           action.payload || action.error?.message || 'Unknown error';
       });
+
+    builder.addCase(fetchUserById.pending, (state, action) => {
+      state.userloading = true;
+      state.error = null;
+    });
+    builder.addCase(fetchUserById.fulfilled, (state, action) => {
+      state.userloading = false;
+      state.userData = action.payload;
+      state.error = null;
+    });
+    builder.addCase(fetchUserById.rejected, (state, action) => {
+      state.userloading = false;
+      state.userError = action.payload || action.error?.message;
+    });
   },
 });
 
