@@ -20,9 +20,9 @@ const UserDetailScreen = ({ route: { params } }) => {
   const { id } = params;
 
   useEffect(() => {
-    dispatch(fetchUserById(id));
+    const promise = dispatch(fetchUserById(id));
+    return () => promise.abort();
   }, [id]);
-
   if (userloading) {
     return (
       <View style={userStyles.container}>

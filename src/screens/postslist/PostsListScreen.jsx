@@ -6,27 +6,38 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts, fetchUserById } from '../../reducer/dataSlice';
+import { fetchPosts, searchQuery } from '../../reducer/dataSlice';
 import { styles } from './styles';
 import { Card, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
 const PostsListScreen = () => {
+  const [query, setQuery] = useState('');
   const dispatch = useDispatch();
   const { navigate } = useNavigation();
-  const { data, loading } = useSelector(state => state.data);
-
+  const { data, loading, filtered } = useSelector(state => state.data);
+  const debouncedSearch = useMemo(
+    () => debounce(text => dispatch(searchQuery(text)), 500),
+    [dispatch],
+  );
   useEffect(() => {
-    dispatch(fetchPosts());
+    const promise = dispatch(fetchPosts());
+    return () => promise.abort();
   }, [dispatch]);
 
   const renderItem = ({ item, index }) => {
     return (
       <Card style={styles.card}>
         <Card.Content>
-          <Pressable onPress={() => handleCardNavigation()}>
+          <Pressable onPress={() => handleCardNavigation(item.id)}>
             <View style={styles.cardHeader}>
               <View style={styles.numberBadge}>
                 <Text style={styles.numberText}>{index + 1}</Text>
@@ -73,7 +84,7 @@ const PostsListScreen = () => {
   };
 
   const renderListFooter = () => {
-    if (!data || data.length === 0) return null;
+    if (!filtered || filtered.length === 0) return null;
 
     return (
       <View style={styles.footerContainer}>
@@ -87,32 +98,35 @@ const PostsListScreen = () => {
   const handleNavigation = id => {
     navigate('user', { id });
   };
-  const handleCardNavigation = () => {
-    navigate('postdetails');
+  const handleCardNavigation = postId => {
+    navigate('postdetails', { postId });
+  };
+  const handleChange = text => {
+    setQuery(text);
+    debouncedSearch(text);
   };
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header_title}>Posts List</Text>
-        {data && data.length > 0 && (
+        {filtered && filtered.length > 0 && (
           <View style={styles.countBadge}>
-            <Text style={styles.countText}>{data.length}</Text>
+            <Text style={styles.countText}>{filtered.length}</Text>
           </View>
         )}
       </View>
       <TextInput
-        style={{
-          // marginTop: 15,
-          marginHorizontal: 15,
-          backgroundColor: 'white',
-        }}
+        style={styles.input}
         label="Search"
         mode="outlined"
         placeholder="Type userId or title"
         left={<TextInput.Icon icon="account-search" />}
+        onChangeText={e => handleChange(e)}
+        activeOutlineColor="#1976d2"
+        textColor="#0000"
       />
       <FlatList
-        data={data}
+        data={filtered}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         keyExtractor={item => item.id?.toString() ?? Math.random().toString()}

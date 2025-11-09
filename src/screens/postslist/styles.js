@@ -10,6 +10,10 @@ export const styles = StyleSheet.create({
     fontSize: moderateScale(28, 0.4),
     fontWeight: '500',
   },
+  input: {
+    marginHorizontal: 15,
+    backgroundColor: 'white',
+  },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
