@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts } from '../../reducer/dataSlice';
+import { fetchPosts, fetchUserById } from '../../reducer/dataSlice';
 import { styles } from './styles';
 import { Card, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -26,7 +26,7 @@ const PostsListScreen = () => {
     return (
       <Card style={styles.card}>
         <Card.Content>
-          <Pressable onPress={() => console.log('clicked')}>
+          <Pressable onPress={() => handleCardNavigation()}>
             <View style={styles.cardHeader}>
               <View style={styles.numberBadge}>
                 <Text style={styles.numberText}>{index + 1}</Text>
@@ -36,7 +36,7 @@ const PostsListScreen = () => {
             {item.body && (
               <TouchableOpacity
                 style={styles.userName}
-                onPress={() => navigate('user')}
+                onPress={() => handleNavigation(item.userId)}
               >
                 <Text
                   style={{
@@ -84,6 +84,12 @@ const PostsListScreen = () => {
     );
   };
 
+  const handleNavigation = id => {
+    navigate('user', { id });
+  };
+  const handleCardNavigation = () => {
+    navigate('postdetails');
+  };
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -114,6 +120,9 @@ const PostsListScreen = () => {
         ListFooterComponent={renderListFooter}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={styles.listContent}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
       />
     </View>
   );

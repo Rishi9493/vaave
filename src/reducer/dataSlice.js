@@ -7,7 +7,7 @@ const initialState = {
   data: [],
   error: null,
   userloading: false,
-  userData: [],
+  userData: {},
   userError: null,
 };
 
